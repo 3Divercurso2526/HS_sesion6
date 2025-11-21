@@ -1,0 +1,308 @@
+<!-- Chosen Palette: Fresh & Focused Greens -->
+<!-- Application Structure Plan: This SPA is the fifth installment of the teacher-facing session dashboard. It focuses on the "General Rehearsal". The structure follows the established pattern: vertical accordion phases for flow control. Key features for this specific session include a dual-timer in Phase 2 (one for presentation, one for feedback) to strictly manage the rehearsal slots, and a dedicated phase for "Immediate Reflection" where students process the feedback. This structure prioritizes active listening from the audience and immediate application of feedback by the presenters. -->
+<!-- Visualization & Content Choices: Report Info -> Session 5 Plan. Goal -> Organize & Manage. Viz/Presentation Method -> Interactive Accordion. Interaction -> Expand/Collapse phases. Justification -> Consistent UX. Report Info -> Rehearsal Timing (8+4 min). Goal -> Time Management. Viz/Presentation Method -> Dual JS Timers. Interaction -> Start distinct timers for pitch vs feedback. Justification -> Critical to ensure all teams fit in the hour. Report Info -> Peer Review method. Goal -> Pedagogical instruction. Viz/Presentation Method -> Info box "Normas de oro". Interaction -> Static. Justification -> Reminds teacher of the specific feedback methodology. All elements built with HTML/Tailwind and JS. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Sesión 5: Ensayo General y Feedback</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .phase-header[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+        .task-item input:checked + label { text-decoration: line-through; color: #6b7280; }
+        .timer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- MODAL DE MATERIALES -->
+    <div id="materials-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-2xl p-8 max-w-lg w-full m-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-green-800">Materiales necesarios</h3>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+            </div>
+            <ul class="list-disc list-inside space-y-2 text-lg">
+                <li>Proyector o Pizarra Digital.</li>
+                <li>Ordenadores para cada equipo (para las presentaciones).</li>
+                <li>Acceso a Internet.</li>
+                <li>Fichas de "Rúbrica de Evaluación entre Pares" (una por alumno/a).</li>
+                <li>Cronómetro visible (o el de esta aplicación).</li>
+                <li>Pizarra o papelógrafo para notas generales.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8">
+        <!-- CABECERA -->
+        <header class="bg-white p-6 rounded-xl shadow-md mb-8 border-l-8 border-green-700">
+            <h1 class="text-3xl sm:text-4xl font-black text-gray-900">Proyecto "Sembrando Futuro"</h1>
+            <h2 class="text-xl sm:text-2xl font-bold text-green-700 mt-1">Guion Interactivo: Sesión 5</h2>
+            <div class="flex justify-between items-center mt-4">
+                <p class="text-gray-600"><strong>Fecha:</strong> Lunes, 24 de Noviembre de 2025</p>
+                <button id="open-modal-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                    Ver Materiales 📋
+                </button>
+            </div>
+        </header>
+
+        <!-- FASES DE LA SESIÓN -->
+        <div class="space-y-6">
+
+            <!-- FASE 1 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <button class="w-full p-5 flex justify-between items-center text-left phase-header" aria-expanded="true" data-target="phase1-content">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">FASE 1: Preparación y normas del ensayo</h3>
+                        <p class="text-gray-500">Explicación de la dinámica y reparto de rúbricas.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <span class="font-bold text-lg text-green-700">10 min</span>
+                            <div id="timer1" class="text-gray-600 font-mono">10:00</div>
+                        </div>
+                        <span class="text-2xl transition-transform chevron">▲</span>
+                    </div>
+                </button>
+                <div id="phase1-content" class="p-6 border-t">
+                    <div class="flex justify-center space-x-2 mb-6">
+                        <button class="timer-btn px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700" data-time="600" data-timer-id="timer1">Iniciar</button>
+                        <button class="timer-btn px-4 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600" data-action="pause" data-timer-id="timer1">Pausar</button>
+                        <button class="timer-btn px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700" data-action="reset" data-timer-id="timer1">Reset</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="task-item"><input type="checkbox" id="task1-1"><label for="task1-1" class="ml-3 text-lg">Dar la bienvenida y explicar que hoy es el "ensayo general" antes de la presentación oficial.</label></div>
+                        <div class="task-item"><input type="checkbox" id="task1-2"><label for="task1-2" class="ml-3 text-lg">Explicar el formato: cada empresa tendrá 8 minutos para presentar + 4 minutos de feedback del público.</label></div>
+                        <div class="bg-yellow-100 p-4 rounded-lg">
+                            <p class="font-bold">⭐ Normas de oro para el feedback:</p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Siempre empezar por lo positivo (2 estrellas: "me ha gustado...").</li>
+                                <li>Luego dar 1 sugerencia constructiva ("podríais mejorar...").</li>
+                                <li>Ser específicos y amables. El objetivo es ayudar, no criticar.</li>
+                            </ul>
+                        </div>
+                        <div class="task-item"><input type="checkbox" id="task1-3"><label for="task1-3" class="ml-3 text-lg">Entregar la "Rúbrica de Evaluación entre Pares" a cada alumno y alumna.</label></div>
+                        <div class="task-item"><input type="checkbox" id="task1-4"><label for="task1-4" class="ml-3 text-lg">Explicar los 4 criterios de la rúbrica (los mismos del Pliego): Innovación, Viabilidad, Sostenibilidad, Calidad de presentación.</label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FASE 2 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <button class="w-full p-5 flex justify-between items-center text-left phase-header" aria-expanded="false" data-target="phase2-content">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">FASE 2: Ronda de presentaciones</h3>
+                        <p class="text-gray-500">Cada equipo presenta su propuesta (8 min + 4 min feedback).</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <span class="font-bold text-lg text-green-700">60 min</span>
+                            <div id="timer2" class="text-gray-600 font-mono">12:00</div>
+                        </div>
+                        <span class="text-2xl transition-transform chevron">▼</span>
+                    </div>
+                </button>
+                <div id="phase2-content" class="p-6 border-t hidden">
+                    <div class="flex justify-center space-x-2 mb-6">
+                        <button class="timer-btn px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700" data-time="480" data-timer-id="timer2">Iniciar 8 min</button>
+                        <button class="timer-btn px-4 py-1 bg-blue-600 text-white rounded hover:bg-blue-700" data-time="240" data-timer-id="timer2">Iniciar 4 min</button>
+                        <button class="timer-btn px-4 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600" data-action="pause" data-timer-id="timer2">Pausar</button>
+                        <button class="timer-btn px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700" data-action="reset" data-timer-id="timer2">Reset</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="task-item"><input type="checkbox" id="task2-1"><label for="task2-1" class="ml-3 text-lg">Sortear o establecer el orden de presentación de los equipos.</label></div>
+                        <div class="bg-blue-100 p-4 rounded-lg">
+                            <p class="font-bold text-blue-800">🎯 Dinámica por cada equipo:</p>
+                            <ol class="list-decimal list-inside ml-4 text-blue-900">
+                                <li>El equipo se coloca delante y proyecta su presentación.</li>
+                                <li>Inicia el temporizador de 8 minutos (botón verde).</li>
+                                <li>Presentan su propuesta (Informe resumido en formato pitch).</li>
+                                <li>Avisa cuando quede 1 minuto.</li>
+                                <li>Cuando terminen, inicia el temporizador de 4 minutos (botón azul).</li>
+                                <li>El resto del aula da feedback oral usando la estructura "2 estrellas + 1 deseo".</li>
+                                <li>Anota en la pizarra las sugerencias más repetidas para que el equipo las tenga presentes.</li>
+                            </ol>
+                        </div>
+                        <div class="task-item"><input type="checkbox" id="task2-2"><label for="task2-2" class="ml-3 text-lg">Equipo 1: Presentación + Feedback.</label></div>
+                        <div class="task-item"><input type="checkbox" id="task2-3"><label for="task2-3" class="ml-3 text-lg">Equipo 2: Presentación + Feedback.</label></div>
+                        <div class="task-item"><input type="checkbox" id="task2-4"><label for="task2-4" class="ml-3 text-lg">Equipo 3: Presentación + Feedback.</label></div>
+                        <div class="task-item"><input type="checkbox" id="task2-5"><label for="task2-5" class="ml-3 text-lg">Equipo 4: Presentación + Feedback.</label></div>
+                        <div class="task-item"><input type="checkbox" id="task2-6"><label for="task2-6" class="ml-3 text-lg">Equipo 5: Presentación + Feedback (si hay más equipos, añade más checkboxes).</label></div>
+                        <div class="bg-red-100 p-4 rounded-lg">
+                            <p class="font-bold text-red-800">⭐ Tu rol como facilitadora:</p>
+                            <ul class="list-disc list-inside ml-4 text-red-900">
+                                <li>Gestiona el tiempo con firmeza pero con flexibilidad si hace falta (los cambios de grupo consumen tiempo).</li>
+                                <li>Modera el feedback: asegúrate de que sea constructivo y respetuoso.</li>
+                                <li>Toma nota mental de los puntos fuertes y débiles de cada propuesta.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FASE 3 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <button class="w-full p-5 flex justify-between items-center text-left phase-header" aria-expanded="false" data-target="phase3-content">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">FASE 3: Reflexión y plan de mejora</h3>
+                        <p class="text-gray-500">Cada equipo identifica qué va a mejorar.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <span class="font-bold text-lg text-green-700">15 min</span>
+                            <div id="timer3" class="text-gray-600 font-mono">15:00</div>
+                        </div>
+                        <span class="text-2xl transition-transform chevron">▼</span>
+                    </div>
+                </button>
+                <div id="phase3-content" class="p-6 border-t hidden">
+                    <div class="flex justify-center space-x-2 mb-6">
+                        <button class="timer-btn px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700" data-time="900" data-timer-id="timer3">Iniciar</button>
+                        <button class="timer-btn px-4 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600" data-action="pause" data-timer-id="timer3">Pausar</button>
+                        <button class="timer-btn px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700" data-action="reset" data-timer-id="timer3">Reset</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="task-item"><input type="checkbox" id="task3-1"><label for="task3-1" class="ml-3 text-lg">Pedir a cada equipo que se reúna brevemente.</label></div>
+                        <div class="bg-yellow-100 p-4 rounded-lg">
+                            <p class="font-bold">🎯 Tarea para los equipos:</p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Revisar las rúbricas que han recibido de sus compañeros y compañeras.</li>
+                                <li>Identificar las 3 mejoras más urgentes según el feedback recibido.</li>
+                                <li>Escribir en su Padlet un "Plan de Mejora" con estas 3 acciones concretas para antes de la presentación oficial.</li>
+                            </ul>
+                        </div>
+                        <div class="task-item"><input type="checkbox" id="task3-2"><label for="task3-2" class="ml-3 text-lg">Circular por los equipos para resolver dudas y ayudarles a priorizar.</label></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FASE 4 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <button class="w-full p-5 flex justify-between items-center text-left phase-header" aria-expanded="false" data-target="phase4-content">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">FASE 4: Cierre y preparación final</h3>
+                        <p class="text-gray-500">Próximos pasos hacia la presentación oficial.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-right">
+                            <span class="font-bold text-lg text-green-700">5 min</span>
+                            <div id="timer4" class="text-gray-600 font-mono">05:00</div>
+                        </div>
+                        <span class="text-2xl transition-transform chevron">▼</span>
+                    </div>
+                </button>
+                <div id="phase4-content" class="p-6 border-t hidden">
+                    <div class="flex justify-center space-x-2 mb-6">
+                        <button class="timer-btn px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700" data-time="300" data-timer-id="timer4">Iniciar</button>
+                        <button class="timer-btn px-4 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600" data-action="pause" data-timer-id="timer4">Pausar</button>
+                        <button class="timer-btn px-4 py-1 bg-red-600 text-white rounded hover:bg-red-700" data-action="reset" data-timer-id="timer4">Reset</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="task-item"><input type="checkbox" id="task4-1"><label for="task4-1" class="ml-3 text-lg">Felicitar a todos los equipos por su trabajo y por el feedback constructivo dado.</label></div>
+                        <div class="task-item"><input type="checkbox" id="task4-2"><label for="task4-2" class="ml-3 text-lg">Anunciar la fecha y hora de la presentación oficial (Sesión 6).</label></div>
+                        <div class="bg-green-100 p-4 rounded-lg">
+                            <p class="font-bold text-green-800">📅 Tarea para la próxima sesión:</p>
+                            <ul class="list-disc list-inside ml-4 text-green-900">
+                                <li>Implementar las 3 mejoras identificadas en la presentación y/o el informe.</li>
+                                <li>Hacer un último ensayo en casa o en horario extraescolar.</li>
+                                <li>Traer el informe impreso (1 copia por equipo) para entregar al jurado.</li>
+                                <li>Venir preparados y preparadas para defender su proyecto con confianza.</li>
+                            </ul>
+                        </div>
+                        <div class="task-item"><input type="checkbox" id="task4-3"><label for="task4-3" class="ml-3 text-lg">Recordar que en la presentación oficial puede haber profesores, profesoras, dirección u otros invitados e invitadas.</label></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            try {
+                // Lógica para acordeones
+                const phaseHeaders = document.querySelectorAll('.phase-header');
+                phaseHeaders.forEach(header => {
+                    header.addEventListener('click', () => {
+                        const target = document.getElementById(header.dataset.target);
+                        const isExpanded = header.getAttribute('aria-expanded') === 'true';
+                        header.setAttribute('aria-expanded', !isExpanded);
+                        target.classList.toggle('hidden');
+                    });
+                });
+            } catch (e) {
+                console.error('Error en la lógica de acordeones:', e);
+            }
+
+            try {
+                // Lógica para el modal
+                const modal = document.getElementById('materials-modal');
+                const openBtn = document.getElementById('open-modal-btn');
+                const closeBtn = document.getElementById('close-modal-btn');
+                openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+                closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+            } catch (e) {
+                console.error('Error en la lógica del modal:', e);
+            }
+
+            try {
+                // Lógica para los temporizadores
+                const timers = {};
+                document.querySelectorAll('.timer-btn').forEach(button => {
+                    const timerId = button.dataset.timerId;
+                    if (!timers[timerId]) {
+                        timers[timerId] = { interval: null, remaining: 0, initialTime: 0 };
+                    }
+
+                    button.addEventListener('click', () => {
+                        const action = button.dataset.action;
+                        const timerDisplay = document.getElementById(timerId);
+
+                        if (button.dataset.time) { // Botón de Iniciar
+                            clearInterval(timers[timerId].interval);
+                            const totalSeconds = parseInt(button.dataset.time, 10);
+                            timers[timerId].initialTime = totalSeconds;
+                            timers[timerId].remaining = totalSeconds;
+                            
+                            timers[timerId].interval = setInterval(() => {
+                                timers[timerId].remaining--;
+                                const minutes = Math.floor(timers[timerId].remaining / 60).toString().padStart(2, '0');
+                                const seconds = (timers[timerId].remaining % 60).toString().padStart(2, '0');
+                                timerDisplay.textContent = `${minutes}:${seconds}`;
+
+                                if (timers[timerId].remaining <= 0) {
+                                    clearInterval(timers[timerId].interval);
+                                    timerDisplay.textContent = "¡Tiempo!";
+                                    timerDisplay.classList.add('text-red-500', 'font-bold');
+                                }
+                            }, 1000);
+                        } else if (action === 'pause') {
+                            clearInterval(timers[timerId].interval);
+                        } else if (action === 'reset') {
+                            clearInterval(timers[timerId].interval);
+                            timers[timerId].remaining = timers[timerId].initialTime || parseInt(document.querySelector(`.timer-btn[data-timer-id="${timerId}"][data-time]`).dataset.time, 10);
+                            const minutes = Math.floor(timers[timerId].remaining / 60).toString().padStart(2, '0');
+                            const seconds = (timers[timerId].remaining % 60).toString().padStart(2, '0');
+                            timerDisplay.textContent = `${minutes}:${seconds}`;
+                            timerDisplay.classList.remove('text-red-500', 'font-bold');
+                        }
+                    });
+                });
+            } catch (e) {
+                console.error('Error en la lógica de temporizadores:', e);
+            }
+        });
+    </script>
+</body>
+</html>
